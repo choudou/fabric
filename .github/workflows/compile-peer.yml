@@ -1,0 +1,31 @@
+name: Compile Fabric Peer
+on:
+  push:
+    branches: [ main, v1.4.2 ]  # 提交代码到这些分支时触发
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.12.12'  # 匹配 Fabric 版本的 Go 版本
+
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt install -y make gcc
+
+      - name: Compile peer
+        run: |
+          make peer  # 仅编译 peer
+
+      - name: Upload peer binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: peer-binary
+          path: build/bin/peer  # 上传编译后的二进制文件
